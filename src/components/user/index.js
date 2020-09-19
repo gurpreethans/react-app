@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { connect }    from 'react-redux';
 import { storeUser }  from '../../actions';
 import {Input, Button, FormControl} from '@material-ui/core';
+import UserList from '../userList';
 
 const useStyles = theme => ({
   root: {
@@ -41,7 +42,6 @@ class User extends React.Component {
     const { classes } = this.props;
     return (
       <div className="User">
-        <div>{this.state.data.firstName}</div>
         <form id="user" className={classes.root} noValidate autoComplete="off" onSubmit={this.handleForm}>
           <FormControl>
             <Input placeholder="First Name" name="firstName" inputProps={{ 'aria-label': 'description' }} />
@@ -61,6 +61,9 @@ class User extends React.Component {
             </Button>
           </FormControl>
         </form>
+        <div>
+          <UserList users={this.props.data.users} />
+        </div>
       </div>
     );
   }
@@ -72,5 +75,9 @@ const mapDispatchToProps = dispatch => {
   }
 }
 
+function mapStateToProps(state) {
+  return { data: state.usersList }
+}
+
 // export default withStyles(useStyles)(User)
-export default connect(null, mapDispatchToProps)(withStyles(useStyles)(User))
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(useStyles)(User))
