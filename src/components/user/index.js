@@ -1,27 +1,19 @@
 import React          from 'react';
-import { withStyles } from '@material-ui/core/styles';
 import { connect }    from 'react-redux';
 import { storeUser }  from '../../actions';
-import {Input, Button, FormControl} from '@material-ui/core';
 import UserList from '../userList';
-
-const useStyles = theme => ({
-  root: {
-    '& > *': {
-      margin: theme.spacing(1),
-    },
-  },
-})
+import UserForm from '../userForm';
 
 class User extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {data: {email: '', firstName: '', lastName: '', occupation: ''} };
+    this.state = {data: {}};
   }
 
   handleForm = (event) => {
     event.preventDefault();
+    var _target = event.target
     const newState = {};
     Object.entries(event.target.elements).forEach(ele => {
       let e = ele[1]
@@ -30,40 +22,26 @@ class User extends React.Component {
       }
     });
     
+    newState['id'] = Date.now();
     this.setState({
-      data: newState
-    }, () => {
-      this.props.storeUser(this.state.data)
-    })
-
+        data: newState
+      }, () => {
+        this.props.storeUser(this.state.data).then(response => {
+          if(response.status === 'success'){
+            this.setState({
+              data: {}
+            })
+            _target.reset();
+          }
+        });
+      })
   }
 
   render() {
-    const { classes } = this.props;
     return (
-      <div className="User">
-        <form id="user" className={classes.root} noValidate autoComplete="off" onSubmit={this.handleForm}>
-          <FormControl>
-            <Input placeholder="First Name" name="firstName" inputProps={{ 'aria-label': 'description' }} />
-          </FormControl>
-          <FormControl>
-          <Input placeholder="Last Name" name="lastName"  inputProps={{ 'aria-label': 'description' }}  />
-          </FormControl>
-          <FormControl>
-          <Input placeholder="Email" name="email"  inputProps={{ 'aria-label': 'description' }}   />
-          </FormControl>
-          <FormControl>
-          <Input placeholder="Occupation" name="occupation"  inputProps={{ 'aria-label': 'description' }}   />
-          </FormControl>
-          <FormControl>
-            <Button type="submit"  variant="contained" color="primary" disableElevation>
-              Submit
-            </Button>
-          </FormControl>
-        </form>
-        <div>
-          <UserList users={this.props.data.users} />
-        </div>
+      <div>
+        <UserForm handleForm={this.handleForm} user={this.state.data} />
+        <UserList users={this.props.data.users} />
       </div>
     );
   }
@@ -80,4 +58,4 @@ function mapStateToProps(state) {
 }
 
 // export default withStyles(useStyles)(User)
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(useStyles)(User))
+export default connect(mapStateToProps, mapDispatchToProps)(User)
