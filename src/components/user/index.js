@@ -21,8 +21,9 @@ class User extends React.Component {
         newState[e.name] = e.value;
       }
     });
-    
+
     newState['id'] = Date.now();
+    newState['date'] = Date.now();
     this.setState({
         data: newState
       }, () => {
